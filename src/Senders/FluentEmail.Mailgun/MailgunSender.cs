@@ -24,7 +24,7 @@ namespace FluentEmail.Mailgun
             _domainName = domainName;
             _apiKey = apiKey;
             string url = string.Empty;
-            switch(mailGunRegion)
+            switch (mailGunRegion)
             {
                 case MailGunRegion.USA:
                     url = $"https://api.mailgun.net/v3/{_domainName}/";
@@ -54,16 +54,20 @@ namespace FluentEmail.Mailgun
             var parameters = new List<KeyValuePair<string, string>>();
 
             parameters.Add(new KeyValuePair<string, string>("from", $"{email.Data.FromAddress.Name} <{email.Data.FromAddress.EmailAddress}>"));
-            email.Data.ToAddresses.ForEach(x => {
+            email.Data.ToAddresses.ForEach(x =>
+            {
                 parameters.Add(new KeyValuePair<string, string>("to", $"{x.Name} <{x.EmailAddress}>"));
             });
-            email.Data.CcAddresses.ForEach(x => {
+            email.Data.CcAddresses.ForEach(x =>
+            {
                 parameters.Add(new KeyValuePair<string, string>("cc", $"{x.Name} <{x.EmailAddress}>"));
             });
-            email.Data.BccAddresses.ForEach(x => {
+            email.Data.BccAddresses.ForEach(x =>
+            {
                 parameters.Add(new KeyValuePair<string, string>("bcc", $"{x.Name} <{x.EmailAddress}>"));
             });
-            email.Data.ReplyToAddresses.ForEach(x => {
+            email.Data.ReplyToAddresses.ForEach(x =>
+            {
                 parameters.Add(new KeyValuePair<string, string>("h:Reply-To", $"{x.Name} <{x.EmailAddress}>"));
             });
             parameters.Add(new KeyValuePair<string, string>("subject", email.Data.Subject));
@@ -83,10 +87,10 @@ namespace FluentEmail.Mailgun
             foreach (var emailHeader in email.Data.Headers)
             {
                 var key = emailHeader.Key;
-                if (!key.StartsWith("h:"))
-                {
-                    key = "h:" + emailHeader.Key;
-                }
+                //if (!key.StartsWith("h:"))
+                //{
+                //    key = "h:" + emailHeader.Key;
+                //}
 
                 parameters.Add(new KeyValuePair<string, string>(key, emailHeader.Value));
             }
@@ -112,7 +116,7 @@ namespace FluentEmail.Mailgun
 
             var response = await _httpClient.PostMultipart<MailgunResponse>("messages", parameters, files).ConfigureAwait(false);
 
-            var result = new SendResponse {MessageId = response.Data?.Id};
+            var result = new SendResponse { MessageId = response.Data?.Id };
             if (!response.Success)
             {
                 result.ErrorMessages.AddRange(response.Errors.Select(x => x.ErrorMessage));
